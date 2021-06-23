@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+# wrapper for ansible-playbook to log output
+#
+
+set -euo pipefail
+#set -x
+
+
+function main {
+    local logfile=""
+    local playbook=""
+
+    # make logs dir if it doesnt exist
+    [ ! -e ./logs -a ! -d ./logs ] && { mkdir logs; }
+
+    # exit if no arguments were passed
+    [ ${#@} -eq 0 ] && { echo "usage: $0 [ansible-playbook options]"; exit; }
+
+    playbook=$(echo "$@" | grep -o "[a-z]*.yml")
+    logfile="logs/$(date +%Y-%m-%dT%H:%M:%S).${playbook}.log"
+
+    echo "[I] Logfile: $logfile"
+    echo "[I] command: ansible-playbook $@" | tee $logfile
+
+    ansible-playbook $@ | tee -a $logfile
+}
+
+main "$@"

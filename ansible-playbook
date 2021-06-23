@@ -17,10 +17,11 @@ function main {
     # exit if no arguments were passed
     [ ${#@} -eq 0 ] && { echo "usage: $0 [ansible-playbook options]"; exit; }
 
-    playbook=$(echo "$@" | grep -o "[a-z]*.yml")
+    playbook=$(basename $(echo "$@" | grep -oE '\S+\.yml'))
     logfile="logs/$(date +%Y-%m-%dT%H:%M:%S).${playbook}.log"
 
     echo "[I] Logfile: $logfile"
+    echo "[I] Playbook: $playbook"
     echo "[I] command: ansible-playbook $@" | tee $logfile
 
     ansible-playbook $@ | tee -a $logfile
